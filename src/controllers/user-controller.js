@@ -58,6 +58,40 @@ const signIn = async (req, res) => {
     }
 };
 
+
+const isAuthenticated = async (req, res) => {
+    try {
+        const token = req.headers['x-access-token'];
+
+        if (!token) {
+            return res.status(ClientErrorCodes.UNAUTHORIZED).json({
+                message: 'No token provided',
+                data: {},
+                success: false,
+                err: {}
+            });
+        }
+
+        const response = await userService.isAuthenticated(token); 
+        return res.status(SuccessCodes.OK).json({
+            message: 'Token verified successfully',
+            data: response,
+            success: true,
+            err: {}
+        });
+
+    } catch (error) {
+        console.log('Token verification error', error);
+        return res.status(ClientErrorCodes.UNAUTHORIZED).json({
+            message: 'Invalid or expired token',
+            data: {},
+            success: false,
+            err: error.message || error
+        });
+    }
+};
+
+
 const getById = async (req, res) => {
     try {
         const user = await new UserService().getById(req.params.id);
@@ -168,5 +202,6 @@ module.exports = {
     getAll,
     update,
     remove,
-    signIn
+    signIn,
+    isAuthenticated
 };
