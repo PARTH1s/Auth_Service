@@ -25,6 +25,39 @@ const create = async (req, res) => {
     }
 };
 
+const signIn = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(ClientErrorCodes.BAD_REQUEST).json({
+                message: 'Email and Password are required',
+                data: {},
+                success: false,
+                err: {}
+            });
+        }
+
+        const token = await new UserService().signIn(email, password);
+
+        return res.status(SuccessCodes.OK).json({
+            message: 'User signed in successfully',
+            data: { token },
+            success: true,
+            err: {}
+        });
+
+    } catch (error) {
+        console.log('Sign-in error', error);
+        return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
+            message: 'Something went wrong.',
+            data: {},
+            success: false,
+            err: error.message || error
+        });
+    }
+};
+
 const getById = async (req, res) => {
     try {
         const user = await new UserService().getById(req.params.id);
@@ -134,5 +167,6 @@ module.exports = {
     getById,
     getAll,
     update,
-    remove
+    remove,
+    signIn
 };

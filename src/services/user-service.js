@@ -44,10 +44,33 @@ class UserService {
         try {
             return bcrypt.compare(userinpuplainpassword, encryptedpassword);
         } catch (error) {
-            console.log("Somethign went wrong in password checking.");
+            console.log("Something went wrong in password checking.");
             throw error;
         }
     }
+
+    async signIn(email, plainpassword) {
+        try {
+            const user = await this.userRepository.getByEmail(email);
+
+            if (!user) {
+                throw { error: "User not found!" };
+            }
+
+            const passwordMatch = await this.checkPassword(plainpassword, user.password);
+            if (!passwordMatch) {
+                throw { error: "Incorrect Password!" };
+            }
+
+            const token = this.createToken({ email: user.email, id: user.id });
+            return token;
+
+        } catch (error) {
+            console.error("Sign-in error:", error);
+            throw error;
+        }
+    }
+
 
     async getById(userId) {
         // Get user by ID
