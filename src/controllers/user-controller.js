@@ -1,3 +1,5 @@
+const { SuccessCodes, ServerErrorCodes, ClientErrorCodes } = require("../utils/error-codes")
+
 const UserService = require('../services/user-service');
 
 const create = async (req, res) => {
@@ -6,7 +8,7 @@ const create = async (req, res) => {
             email: req.body.email,
             password: req.body.password
         });
-        return res.status(201).json({
+        return res.status(SuccessCodes.CREATED).json({
             status: 'success',
             message: 'User created successfully',
             data: response,
@@ -14,7 +16,7 @@ const create = async (req, res) => {
         });
     } catch (error) {
         console.log("Something went wrong in controller layer - create", error);
-        return res.status(500).json({
+        return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
             message: 'Something went wrong.',
             data: {},
             success: false,
@@ -27,7 +29,7 @@ const getById = async (req, res) => {
     try {
         const user = await new UserService().getById(req.params.id);
         if (!user) {
-            return res.status(404).json({
+            return res.status(ClientErrorCodes.NOT_FOUND).json({
                 status: 'fail',
                 message: 'User not found',
                 data: {},
@@ -42,7 +44,7 @@ const getById = async (req, res) => {
         });
     } catch (error) {
         console.log("Something went wrong in controller layer - getById", error);
-        return res.status(500).json({
+        return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
             message: 'Something went wrong.',
             data: {},
             success: false,
@@ -54,7 +56,7 @@ const getById = async (req, res) => {
 const getAll = async (req, res) => {
     try {
         const users = await new UserService().getAll();
-        return res.status(200).json({
+        return res.status(SuccessCodes.OK).json({
             status: 'success',
             message: 'Users fetched successfully',
             data: users,
@@ -62,7 +64,7 @@ const getAll = async (req, res) => {
         });
     } catch (error) {
         console.log("Something went wrong in controller layer - getAll", error);
-        return res.status(500).json({
+        return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
             message: 'Something went wrong.',
             data: {},
             success: false,
@@ -75,14 +77,14 @@ const update = async (req, res) => {
     try {
         const updated = await new UserService().update(req.params.id, req.body);
         if (!updated) {
-            return res.status(404).json({
+            return res.status(ClientErrorCodes.NOT_FOUND).json({
                 status: 'fail',
                 message: 'User not found or not updated',
                 data: {},
                 err: {}
             });
         }
-        return res.status(200).json({
+        return res.status(SuccessCodes.OK).json({
             status: 'success',
             message: 'User updated successfully',
             data: {},
@@ -90,7 +92,7 @@ const update = async (req, res) => {
         });
     } catch (error) {
         console.log("Something went wrong in controller layer - update", error);
-        return res.status(500).json({
+        return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
             message: 'Something went wrong.',
             data: {},
             success: false,
@@ -103,7 +105,7 @@ const remove = async (req, res) => {
     try {
         const deleted = await new UserService().delete(req.params.id);
         if (!deleted) {
-            return res.status(404).json({
+            return res.status(ClientErrorCodes.NOT_FOUND).json({
                 status: 'fail',
                 message: 'User not found or not deleted',
                 data: {},
@@ -118,7 +120,7 @@ const remove = async (req, res) => {
         });
     } catch (error) {
         console.log("Something went wrong in controller layer - delete", error);
-        return res.status(500).json({
+        return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
             message: 'Something went wrong.',
             data: {},
             success: false,
