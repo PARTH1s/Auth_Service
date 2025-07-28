@@ -1,13 +1,13 @@
-const { User } = require('../models/index');
+const { User } = require("../models/index");
+const { Role } = require("../models/index");
 
 class UserRepository {
-
     async create(data) {
         try {
             const user = await User.create(data);
             return user;
         } catch (error) {
-            console.log("Something went on repository layer - create")
+            console.log("Something went on repository layer - create");
             throw error;
         }
     }
@@ -17,7 +17,7 @@ class UserRepository {
             await User.destroy({ where: { id: userId } });
             return true;
         } catch (error) {
-            console.log("Something went on repository layer - delete")
+            console.log("Something went on repository layer - delete");
             throw error;
         }
     }
@@ -61,6 +61,27 @@ class UserRepository {
             throw error;
         }
     }
+
+    async isAdmin(userId) {
+        try {
+            const user = await User.findByPk(userId);
+            if (!user) return false;
+
+            const adminRole = await Role.findOne({
+                where: { name: "ADMIN" },
+            });
+            if (!adminRole) return false;
+
+            return await user.hasRole(adminRole);
+        } catch (error) {
+            console.log(
+                "Error while checking if user is admin in repository:",
+                error
+            );
+            throw error;
+        }
+    }
+
 }
 
-module.exports = UserRepository
+module.exports = UserRepository;
