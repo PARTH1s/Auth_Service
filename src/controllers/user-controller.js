@@ -72,7 +72,7 @@ const isAuthenticated = async (req, res) => {
             });
         }
 
-        const response = await userService.isAuthenticated(token); 
+        const response = await userService.isAuthenticated(token);
         return res.status(SuccessCodes.OK).json({
             message: 'Token verified successfully',
             data: response,
@@ -196,6 +196,29 @@ const remove = async (req, res) => {
     }
 };
 
+const isAdmin = async (req, res) => {
+    try {
+        const userId = req.body.userId;
+        const response = await new UserService().isAdmin(req.body.id);
+
+        return res.status(SuccessCodes.OK).json({
+            data: response,
+            status: 'success',
+            message: 'Admin status checked successfully',
+            err: {}
+        });
+    } catch (error) {
+        console.log("Something went wrong in controller layer - isAdmin", error);
+        return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
+            message: 'Something went wrong.',
+            data: {},
+            success: false,
+            err: error.message || error
+        });
+    }
+};
+
+
 module.exports = {
     create,
     getById,
@@ -203,5 +226,6 @@ module.exports = {
     update,
     remove,
     signIn,
-    isAuthenticated
+    isAuthenticated,
+    isAdmin
 };

@@ -10,4 +10,16 @@ const validateUserAuth = (req, res, next) => {
     next();
 };
 
-module.exports = {validateUserAuth};
+const validateisAdminUserRequest = (req, res, next) => {
+    if (!req.body.id) {
+        return res.status(400).json({
+            message: 'UserId is not given',
+            data: {},
+            success: false,
+            err: {}
+        });
+    }
+    next();
+};
+
+module.exports = { validateUserAuth, validateisAdminUserRequest };
