@@ -22,5 +22,3 @@ A microservice responsible for handling authentication and authorization in the 
 - **dotenv** for environment configuration
 
 ---
-
-## Project Structure
