@@ -3,6 +3,9 @@ const RolesService = require('../services/roles-service');
 
 const rolesService = new RolesService();
 
+/**
+ * Create a new role
+ */
 const create = async (req, res) => {
     try {
         const response = await rolesService.create({ name: req.body.name });
@@ -13,7 +16,7 @@ const create = async (req, res) => {
             err: {}
         });
     } catch (error) {
-        console.log("Something went wrong in controller layer - create", error);
+        console.error("Controller - create role error:", error);
         return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: 'Something went wrong.',
@@ -23,6 +26,9 @@ const create = async (req, res) => {
     }
 };
 
+/**
+ * Get role by ID
+ */
 const getById = async (req, res) => {
     try {
         const role = await rolesService.getById(req.params.id);
@@ -41,7 +47,7 @@ const getById = async (req, res) => {
             err: {}
         });
     } catch (error) {
-        console.log("Something went wrong in controller layer - getById", error);
+        console.error("Controller - getById error:", error);
         return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: 'Something went wrong.',
@@ -51,6 +57,9 @@ const getById = async (req, res) => {
     }
 };
 
+/**
+ * Get role by name
+ */
 const getByName = async (req, res) => {
     try {
         const role = await rolesService.getByName(req.params.name);
@@ -69,7 +78,7 @@ const getByName = async (req, res) => {
             err: {}
         });
     } catch (error) {
-        console.log("Something went wrong in controller layer - getByName", error);
+        console.error("Controller - getByName error:", error);
         return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: 'Something went wrong.',
@@ -79,6 +88,9 @@ const getByName = async (req, res) => {
     }
 };
 
+/**
+ * Get all roles
+ */
 const getAll = async (req, res) => {
     try {
         const roles = await rolesService.getAll();
@@ -89,7 +101,7 @@ const getAll = async (req, res) => {
             err: {}
         });
     } catch (error) {
-        console.log("Something went wrong in controller layer - getAll", error);
+        console.error("Controller - getAll error:", error);
         return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: 'Something went wrong.',
@@ -99,6 +111,9 @@ const getAll = async (req, res) => {
     }
 };
 
+/**
+ * Update a role by ID
+ */
 const update = async (req, res) => {
     try {
         const updated = await rolesService.update(req.params.id, req.body);
@@ -117,7 +132,7 @@ const update = async (req, res) => {
             err: {}
         });
     } catch (error) {
-        console.log("Something went wrong in controller layer - update", error);
+        console.error("Controller - update role error:", error);
         return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: 'Something went wrong.',
@@ -127,6 +142,9 @@ const update = async (req, res) => {
     }
 };
 
+/**
+ * Delete a role by ID
+ */
 const remove = async (req, res) => {
     try {
         const deleted = await rolesService.delete(req.params.id);
@@ -145,7 +163,7 @@ const remove = async (req, res) => {
             err: {}
         });
     } catch (error) {
-        console.log("Something went wrong in controller layer - delete", error);
+        console.error("Controller - delete role error:", error);
         return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: 'Something went wrong.',

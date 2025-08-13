@@ -7,12 +7,16 @@ const UserService = require("../services/user-service");
 
 const userService = new UserService();
 
+/**
+ * Create a new user
+ */
 const create = async (req, res) => {
     try {
         const response = await userService.create({
             email: req.body.email,
             password: req.body.password,
         });
+
         return res.status(SuccessCodes.CREATED).json({
             success: true,
             message: "User created successfully",
@@ -20,7 +24,7 @@ const create = async (req, res) => {
             err: {},
         });
     } catch (error) {
-        console.log("Something went wrong in controller layer - create", error);
+        console.error("Controller - create user error:", error);
         return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: "Something went wrong.",
@@ -30,7 +34,10 @@ const create = async (req, res) => {
     }
 };
 
-const signIn = async (req, res) => { 
+/**
+ * Sign in a user
+ */
+const signIn = async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -43,7 +50,7 @@ const signIn = async (req, res) => {
             });
         }
 
-        const token = await userService.signIn(email, password);
+        const token = await userService.signin(email, password);
 
         return res.status(SuccessCodes.OK).json({
             success: true,
@@ -52,22 +59,24 @@ const signIn = async (req, res) => {
             err: {},
         });
     } catch (error) {
-        console.log("Sign-in error", error);
+        console.error("Controller - signIn error:", error);
         const statusCode =
-            error.error === "User not found!"
-                ? ClientErrorCodes.NOT_FOUND
-                : error.error === "Incorrect Password!"
-                    ? ClientErrorCodes.UNAUTHORIZED
-                    : ServerErrorCodes.INTERNAL_SERVER_ERROR;
+            error.message === "User not found" ? ClientErrorCodes.NOT_FOUND :
+            error.message === "Incorrect password" ? ClientErrorCodes.UNAUTHORIZED :
+            ServerErrorCodes.INTERNAL_SERVER_ERROR;
+
         return res.status(statusCode).json({
             success: false,
-            message: error.error || "Something went wrong.",
+            message: error.message || "Something went wrong.",
             data: {},
-            err: error.message || error,
+            err: error,
         });
     }
 };
 
+/**
+ * Verify authentication token
+ */
 const isAuthenticated = async (req, res) => {
     try {
         const token = req.headers["x-access-token"];
@@ -89,7 +98,7 @@ const isAuthenticated = async (req, res) => {
             err: {},
         });
     } catch (error) {
-        console.log("Token verification error", error);
+        console.error("Controller - isAuthenticated error:", error);
         return res.status(ClientErrorCodes.UNAUTHORIZED).json({
             success: false,
             message: "Invalid or expired token",
@@ -99,6 +108,9 @@ const isAuthenticated = async (req, res) => {
     }
 };
 
+/**
+ * Get user by ID
+ */
 const getById = async (req, res) => {
     try {
         const user = await userService.getById(req.params.id);
@@ -117,7 +129,7 @@ const getById = async (req, res) => {
             err: {},
         });
     } catch (error) {
-        console.log("Something went wrong in controller layer - getById", error);
+        console.error("Controller - getById error:", error);
         return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: "Something went wrong.",
@@ -127,6 +139,9 @@ const getById = async (req, res) => {
     }
 };
 
+/**
+ * Get all users
+ */
 const getAll = async (req, res) => {
     try {
         const users = await userService.getAll();
@@ -137,7 +152,7 @@ const getAll = async (req, res) => {
             err: {},
         });
     } catch (error) {
-        console.log("Something went wrong in controller layer - getAll", error);
+        console.error("Controller - getAll error:", error);
         return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: "Something went wrong.",
@@ -147,6 +162,9 @@ const getAll = async (req, res) => {
     }
 };
 
+/**
+ * Update user by ID
+ */
 const update = async (req, res) => {
     try {
         const updated = await userService.update(req.params.id, req.body);
@@ -165,7 +183,7 @@ const update = async (req, res) => {
             err: {},
         });
     } catch (error) {
-        console.log("Something went wrong in controller layer - update", error);
+        console.error("Controller - update user error:", error);
         return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: "Something went wrong.",
@@ -175,6 +193,9 @@ const update = async (req, res) => {
     }
 };
 
+/**
+ * Delete user by ID
+ */
 const remove = async (req, res) => {
     try {
         const deleted = await userService.delete(req.params.id);
@@ -193,7 +214,7 @@ const remove = async (req, res) => {
             err: {},
         });
     } catch (error) {
-        console.log("Something went wrong in controller layer - delete", error);
+        console.error("Controller - delete user error:", error);
         return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: "Something went wrong.",
@@ -203,6 +224,9 @@ const remove = async (req, res) => {
     }
 };
 
+/**
+ * Check if user is admin
+ */
 const isAdmin = async (req, res) => {
     try {
         const userId = req.body.id;
@@ -214,7 +238,7 @@ const isAdmin = async (req, res) => {
             err: {},
         });
     } catch (error) {
-        console.log("Something went wrong in controller layer - isAdmin", error);
+        console.error("Controller - isAdmin error:", error);
         return res.status(ServerErrorCodes.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: "Something went wrong.",
