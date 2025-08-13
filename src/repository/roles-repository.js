@@ -1,63 +1,67 @@
 const { Role } = require('../models/index');
 
+/**
+ * Repository for Role entity operations.
+ */
 class RolesRepository {
-
+    // Create a new role
     async create(data) {
         try {
-            const role = await Role.create(data);
-            return role;
+            return await Role.create(data);
         } catch (error) {
-            console.log("Something went wrong in repository layer - create");
+            console.error("Error creating role:", error);
             throw error;
         }
     }
 
+    // Delete a role by ID
     async delete(roleId) {
         try {
-            await Role.destroy({ where: { id: roleId } });
-            return true;
+            const deleted = await Role.destroy({ where: { id: roleId } });
+            return deleted > 0;
         } catch (error) {
-            console.log("Something went wrong in repository layer - delete");
+            console.error("Error deleting role:", error);
             throw error;
         }
     }
 
+    // Get a role by ID
     async getById(roleId) {
         try {
-            const role = await Role.findByPk(roleId);
-            return role;
+            return await Role.findByPk(roleId);
         } catch (error) {
-            console.log("Something went wrong in repository layer - getById");
+            console.error("Error fetching role by ID:", error);
             throw error;
         }
     }
 
+    // Get a role by name
     async getByName(name) {
         try {
-            const role = await Role.findOne({ where: { name } });
-            return role;
+            return await Role.findOne({ where: { name } });
         } catch (error) {
-            console.log("Something went wrong in repository layer - getByName");
+            console.error("Error fetching role by name:", error);
             throw error;
         }
     }
 
+    // Get all roles
     async getAll() {
         try {
-            const roles = await Role.findAll();
-            return roles;
+            return await Role.findAll();
         } catch (error) {
-            console.log("Something went wrong in repository layer - getAll");
+            console.error("Error fetching all roles:", error);
             throw error;
         }
     }
 
+    // Update a role by ID
     async update(roleId, data) {
         try {
-            const [updatedRows] = await Role.update(data, { where: { id: roleId } });
-            return updatedRows > 0; // true if updated
+            const [updated] = await Role.update(data, { where: { id: roleId } });
+            return updated > 0;
         } catch (error) {
-            console.log("Something went wrong in repository layer - update");
+            console.error("Error updating role:", error);
             throw error;
         }
     }

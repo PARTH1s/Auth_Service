@@ -1,87 +1,83 @@
-const { User } = require("../models/index");
-const { Role } = require("../models/index");
+const { User, Role } = require("../models/index");
 
 class UserRepository {
+    // Create a new user
     async create(data) {
         try {
-            const user = await User.create(data);
-            return user;
+            return await User.create(data);
         } catch (error) {
-            console.log("Something went on repository layer - create");
+            console.error("Error in repository - create:", error);
             throw error;
         }
     }
 
+    // Delete a user by ID
     async delete(userId) {
         try {
-            await User.destroy({ where: { id: userId } });
-            return true;
+            const deleted = await User.destroy({ where: { id: userId } });
+            return deleted > 0;
         } catch (error) {
-            console.log("Something went on repository layer - delete");
+            console.error("Error in repository - delete:", error);
             throw error;
         }
     }
 
+    // Get user by ID
     async getById(userId) {
         try {
-            const user = await User.findByPk(userId);
-            return user;
+            return await User.findByPk(userId);
         } catch (error) {
-            console.log("Something went wrong in repository layer - getById");
+            console.error("Error in repository - getById:", error);
             throw error;
         }
     }
 
+    // Get user by email
     async getByEmail(email) {
         try {
-            const user = await User.findOne({ where: { email } });
-            return user;
+            return await User.findOne({ where: { email } });
         } catch (error) {
-            console.log("Something went wrong in repository layer - getByEmail");
+            console.error("Error in repository - getByEmail:", error);
             throw error;
         }
     }
 
+    // Get all users
     async getAll() {
         try {
-            const users = await User.findAll();
-            return users;
+            return await User.findAll();
         } catch (error) {
-            console.log("Something went wrong in repository layer - getAll");
+            console.error("Error in repository - getAll:", error);
             throw error;
         }
     }
 
+    // Update user by ID
     async update(userId, data) {
         try {
             const [updatedRows] = await User.update(data, { where: { id: userId } });
-            return updatedRows > 0; // true if updated
+            return updatedRows > 0;
         } catch (error) {
-            console.log("Something went wrong in repository layer - update");
+            console.error("Error in repository - update:", error);
             throw error;
         }
     }
 
+    // Check if user has ADMIN role
     async isAdmin(userId) {
         try {
             const user = await User.findByPk(userId);
             if (!user) return false;
 
-            const adminRole = await Role.findOne({
-                where: { name: "ADMIN" },
-            });
+            const adminRole = await Role.findOne({ where: { name: "ADMIN" } });
             if (!adminRole) return false;
 
             return await user.hasRole(adminRole);
         } catch (error) {
-            console.log(
-                "Error while checking if user is admin in repository:",
-                error
-            );
+            console.error("Error in repository - isAdmin:", error);
             throw error;
         }
     }
-
 }
 
 module.exports = UserRepository;

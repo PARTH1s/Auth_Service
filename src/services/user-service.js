@@ -1,81 +1,73 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { JWT_KEY } = require("../config/serverConfig");
-
 const UserRepository = require("../repository/user-repository");
 
 class UserService {
   constructor() {
-    this.userRepository = new UserRepository();
+    this.userRepository = new UserRepository(); // Initialize user repository
   }
 
   async create(data) {
     // Create a new user
     try {
-      const user = await this.userRepository.create(data);
-      return user;
+      return await this.userRepository.create(data);
     } catch (error) {
-      console.log("Something went wrong in service layer - create");
+      console.error("Service Layer Error - create:", error);
       throw error;
     }
   }
 
   createToken(user) {
+    // Generate JWT token for a user
     try {
-      const result = jwt.sign(user, JWT_KEY, { expiresIn: "1d" });
-      return result;
+      return jwt.sign(user, JWT_KEY, { expiresIn: "1d" });
     } catch (error) {
-      console.log("Something went wrong in token creation");
+      console.error("Token creation error:", error);
       throw error;
     }
   }
 
   verifyToken(token) {
+    // Verify JWT token
     try {
-      const response = jwt.verify(token, JWT_KEY);
-      return response;
+      return jwt.verify(token, JWT_KEY);
     } catch (error) {
-      console.log("Something went wrong in token validation");
+      console.error("Token verification error:", error);
       throw error;
     }
   }
 
-  checkPassword(userinpuplainpassword, encryptedpassword) {
+  checkPassword(inputPassword, hashedPassword) {
+    // Compare plain password with hashed password
     try {
-      return bcrypt.compare(userinpuplainpassword, encryptedpassword);
+      return bcrypt.compare(inputPassword, hashedPassword);
     } catch (error) {
-      console.log("Something went wrong in password checking.");
+      console.error("Password comparison error:", error);
       throw error;
     }
   }
 
   isAdmin(userId) {
+    // Check if the user has admin role
     try {
       return this.userRepository.isAdmin(userId);
     } catch (error) {
-      console.log("Error while checking if user is admin in service:", error);
+      console.error("Service Layer Error - isAdmin:", error);
       throw error;
     }
   }
 
-  async signIn(email, plainpassword) {
+  async signIn(email, plainPassword) {
+    // Sign in a user and return JWT token
     try {
       const user = await this.userRepository.getByEmail(email);
+      if (!user) throw { error: "User not found!" };
 
-      if (!user) {
-        throw { error: "User not found!" };
-      }
+      const passwordMatch = await this.checkPassword(plainPassword, user.password);
+      if (!passwordMatch) throw { error: "Incorrect Password!" };
 
-      const passwordMatch = await this.checkPassword(
-        plainpassword,
-        user.password
-      );
-      if (!passwordMatch) {
-        throw { error: "Incorrect Password!" };
-      }
-
-      const token = this.createToken({ email: user.email, id: user.id });
-      return token;
+      return this.createToken({ email: user.email, id: user.id });
     } catch (error) {
       console.error("Sign-in error:", error);
       throw error;
@@ -83,20 +75,15 @@ class UserService {
   }
 
   async isAuthenticated(token) {
+    // Validate token and return authenticated user info
     try {
-      const response = await this.verifyToken(token);
-      if (!response) {
-        throw new Error("Invalid Token!");
-      }
+      const decoded = this.verifyToken(token);
+      if (!decoded) throw new Error("Invalid Token!");
 
-      const user = await this.userRepository.getById(response.id);
-      if (!user) {
-        throw new Error("User not found");
-      }
-      return {
-        id: user.id,
-        email: user.email,
-      };
+      const user = await this.userRepository.getById(decoded.id);
+      if (!user) throw new Error("User not found");
+
+      return { id: user.id, email: user.email };
     } catch (error) {
       console.error("Token authentication error:", error);
       throw error;
@@ -106,10 +93,9 @@ class UserService {
   async getById(userId) {
     // Get user by ID
     try {
-      const user = await this.userRepository.getById(userId);
-      return user;
+      return await this.userRepository.getById(userId);
     } catch (error) {
-      console.log("Something went wrong in service layer - getById");
+      console.error("Service Layer Error - getById:", error);
       throw error;
     }
   }
@@ -117,10 +103,9 @@ class UserService {
   async getByEmail(email) {
     // Get user by email
     try {
-      const user = await this.userRepository.getByEmail(email);
-      return user;
+      return await this.userRepository.getByEmail(email);
     } catch (error) {
-      console.log("Something went wrong in service layer - getByEmail");
+      console.error("Service Layer Error - getByEmail:", error);
       throw error;
     }
   }
@@ -128,10 +113,9 @@ class UserService {
   async getAll() {
     // Get all users
     try {
-      const users = await this.userRepository.getAll();
-      return users;
+      return await this.userRepository.getAll();
     } catch (error) {
-      console.log("Something went wrong in service layer - getAll");
+      console.error("Service Layer Error - getAll:", error);
       throw error;
     }
   }
@@ -139,10 +123,9 @@ class UserService {
   async update(userId, data) {
     // Update user by ID
     try {
-      const updated = await this.userRepository.update(userId, data);
-      return updated;
+      return await this.userRepository.update(userId, data);
     } catch (error) {
-      console.log("Something went wrong in service layer - update");
+      console.error("Service Layer Error - update:", error);
       throw error;
     }
   }
@@ -150,10 +133,9 @@ class UserService {
   async delete(userId) {
     // Delete user by ID
     try {
-      const deleted = await this.userRepository.delete(userId);
-      return deleted;
+      return await this.userRepository.delete(userId);
     } catch (error) {
-      console.log("Something went wrong in service layer - delete");
+      console.error("Service Layer Error - delete:", error);
       throw error;
     }
   }
